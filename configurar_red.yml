@@ -1,0 +1,25 @@
+---
+- name: Configuracion de red del servidor
+  hosts: servidor
+  become: true
+  tasks:
+    - name: Configurar red del servidor
+      copy:
+        content: |
+          TYPE=Ethernet
+          PROXY_METHOD=none
+          BROWSER_ONLY=no
+          BOOTPROTO=dhcp
+          NAME=enp0s3
+          DEVICE=enp0s3
+          ONBOOT=yes
+        dest: /etc/sysconfig/network-scripts/ifcfg-enp0s3
+        owner: root
+        group: root
+        mode: "0644"
+        
+  handlers:
+  - name: Reiniciar red
+    service:
+      name: network
+      state: restarted
