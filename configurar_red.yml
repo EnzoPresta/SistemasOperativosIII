@@ -1,11 +1,19 @@
+
 ---
-- name: Configuracion de red del servidor
+- name: Crear archivos
   hosts: servidor
   become: true
+  gather_facts: no
   tasks:
-    - name: Configurar red del servidor
-      copy:
-        content: |
+    - name: Crear archivo
+      file:
+        path: /etc/sysconfig/network-scripts/ifcfg-enp0s3
+        state: touch
+
+    - name: Agregar configuración de red
+      blockinfile:
+        path: /etc/sysconfig/network-scripts/ifcfg-enp0s3
+        block: |
           TYPE=Ethernet
           PROXY_METHOD=none
           BROWSER_ONLY=no
@@ -13,13 +21,9 @@
           NAME=enp0s3
           DEVICE=enp0s3
           ONBOOT=yes
-        dest: /etc/sysconfig/network-scripts/ifcfg-enp0s3
-        owner: root
-        group: root
-        mode: "0644"
-        
+
   handlers:
-  - name: Reiniciar red
-    service:
-      name: network
-      state: restarted
+    - name: Reiniciar red
+      service:
+        name: network
+        state: restarted
