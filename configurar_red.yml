@@ -1,16 +1,10 @@
 
 ---
-- name: Crear archivos
+- name: Archivo de configuración de red
   hosts: servidor
   become: true
-  gather_facts: no
   tasks:
-    - name: Crear archivo
-      file:
-        path: /etc/sysconfig/network-scripts/ifcfg-enp0s3
-        state: touch
-
-    - name: Agregar configuración de red
+    - name: Crear archivo de configuración de red
       blockinfile:
         path: /etc/sysconfig/network-scripts/ifcfg-enp0s3
         block: |
@@ -18,12 +12,7 @@
           PROXY_METHOD=none
           BROWSER_ONLY=no
           BOOTPROTO=dhcp
+          DEFROUTE=yes
           NAME=enp0s3
           DEVICE=enp0s3
           ONBOOT=yes
-
-  handlers:
-    - name: Reiniciar red
-      service:
-        name: network
-        state: restarted
