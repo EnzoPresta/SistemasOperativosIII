@@ -1,18 +1,29 @@
 
 ---
 - name: Archivo de configuración de red
-  hosts: servidor
+  hosts: cliente1
   become: true
   tasks:
-    - name: Crear archivo de configuración de red
-      blockinfile:
-        path: /etc/sysconfig/network-scripts/ifcfg-enp0s3
-        block: |
-          TYPE=Ethernet
-          PROXY_METHOD=none
-          BROWSER_ONLY=no
-          BOOTPROTO=dhcp
-          DEFROUTE=yes
-          NAME=enp0s3
-          DEVICE=enp0s3
-          ONBOOT=yes
+    - name: Red Ethernet
+      lineinfile:
+        path: /etc/sysconfig/network-scripts/ifcfg-enp0s8
+        regexp: '^TYPE'
+        line: 'TYPE=Ethernet'
+
+    - name: Configurar interfaz de red enp0s8
+      lineinfile:
+        path: /etc/sysconfig/network-scripts/ifcfg-enp0s8
+        regexp: '^BOOTPROTO'
+        line: 'BOOTPROTO=static'
+
+     - name: Establecer direccion IP estatica
+       lineinfile:
+        path: /etc/sysconfig/network-scripts/ifcfg-enp0s8
+        regexp: '^IPADDR'
+        line: 'IPADDR=192.168.1.44'
+
+     - name: Establecer mascara de red
+       lineinfile:
+        path: /etc/sysconfig/network-scripts/ifcfg-enp0s8
+        regexp: '^NETMASK'
+        line: 'NETMASK=255.255.255.0'
