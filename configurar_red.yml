@@ -3,27 +3,28 @@
 - name: Archivo de configuración de red
   hosts: cliente1
   become: true
+  gather_facts: no
   tasks:
     - name: Red Ethernet
-      lineinfile:
+      file:
         path: /etc/sysconfig/network-scripts/ifcfg-enp0s8
-        regexp: '^TYPE'
-        line: 'TYPE=Ethernet'
-
+        state: touch
     - name: Configurar interfaz de red enp0s8
       lineinfile:
         path: /etc/sysconfig/network-scripts/ifcfg-enp0s8
-        regexp: '^BOOTPROTO'
-        line: 'BOOTPROTO=static'
+        line: " {{ item }} "
+        insertafter: EOF
+      with_items:
+        - TYPE=Ethernet
+        - BOOTPROTO=static
+        - IPADDR="{{ ip }}"
+        - NETMASK=255.255.255.0
+        - ONBOOT=yes
 
-     - name: Establecer direccion IP estatica
-       lineinfile:
-        path: /etc/sysconfig/network-scripts/ifcfg-enp0s8
-        regexp: '^IPADDR'
-        line: 'IPADDR=192.168.1.44'
-
-     - name: Establecer mascara de red
-       lineinfile:
-        path: /etc/sysconfig/network-scripts/ifcfg-enp0s8
-        regexp: '^NETMASK'
-        line: 'NETMASK=255.255.255.0'
+    - name: Reiniciar servicio
+        become: true
+      systemd:
+        name: network
+        state: restarted
+      command:
+        cmd: ifdown enp0s8 && ifup enp0s8
